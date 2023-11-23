@@ -11,7 +11,7 @@ import SwiftUI
 
 
 
-class EmojiMemoryGameViewModel {
+class EmojiMemoryGameViewModel: ObservableObject {
     // creo la variabile modello che si rifà al modello del gioco
     // la stessa cosa la devo fare anche sun content view, affinchè si rifaccia a questa schermata
     
@@ -29,7 +29,7 @@ class EmojiMemoryGameViewModel {
     private static let emojis = ["😆","🤢","😻","🦾","👿","👹", "🤡", "👻","💀","😵‍💫","👾","🤖"]
     
     private static func createMemoryGame() -> MemoryGame<String> {
-        return MemoryGame(numberOfPairOfCards: 15) { pairIndex in
+        return MemoryGame(numberOfPairOfCards: 10) { pairIndex in
             if emojis.indices.contains(pairIndex){
                 return emojis[pairIndex]
             } else {
@@ -39,7 +39,8 @@ class EmojiMemoryGameViewModel {
         }
     }
     
-    private var model = createMemoryGame()
+    // DEVO METTERE QUESTO PUBLISHED TO FAR VEDERE CHE IL MODELLO PUò CAMBIARE
+    @Published private var model = createMemoryGame()
     
     
     
@@ -47,6 +48,9 @@ class EmojiMemoryGameViewModel {
         return model.cards
     }
     
+    func shuffle(){
+        return model.shuffle()
+    }
     
     /// INTENT FUNCTION
     /// QUESTO FUNZIONI NON VOGLIONO AVERE DEI NOME ESTERNI. QUANDO ANDIAMO A CHIAMARE QUESTA FUNZIONE IN UN ALTRO
@@ -54,8 +58,5 @@ class EmojiMemoryGameViewModel {
         return model.choose(card)
     }
     
-    func toogle(_ card: MemoryGame<String>.Card){
-        return model.toggle(card)
-    }
     
 }
