@@ -1,5 +1,5 @@
 //
-//  ContentView.swift
+//  EmojiContentView.swift
 //  MemorizeRemade
 //
 //  Created by Stefano Morelli on 21/11/23.
@@ -14,10 +14,11 @@ let emojisArray = ["😆","🤢","😻","🦾","👿","👹", "🤡", "👻","�
 let vehiclesArray = ["🚗","🚕","🚙","🚌","🚎","🏎️", "🚓", "🚑","🚗","🚕","🚙","🚌","🚎","🏎️", "🚓", "🚑"]
 let foodArray = ["🍏","🍆","🥝","🫐","🥭","🥥", "🍑","🍏","🍆","🥝","🫐","🥭","🥥", "🍑"]
 
+/// LA PARTE UI è  REACTIVE STATELESS  --> QUALCOSA CAMBIA NEL VIEW MODEL, QUESTA RI RIAGGIORNA
 
-
-struct ContentView: View {
-    @State var emojisToDisplay = emojisArray
+struct EmojiContentView: View {
+// va a puntare al viewModel
+    var viewModel: EmojiMemoryGameViewModel
     
     var body: some View {
         Text("Memorize!")
@@ -29,15 +30,15 @@ struct ContentView: View {
         }
         .padding()
         HStack(spacing:20){
-            ThemeButton(imageName: "car", label: "Vehicle", action: {
-                changeTheme(vehiclesArray)
-            })
-            ThemeButton(imageName: "face.smiling", label: "Emojis", action: {
-                changeTheme(emojisArray)
-            })
-            ThemeButton(imageName: "carrot", label: "Food", action: {
-                changeTheme(foodArray)
-            })
+            //ThemeButton(imageName: "car", label: "Vehicle", action: {
+            //    changeTheme(vehiclesArray)
+            //})
+            //ThemeButton(imageName: "face.smiling", label: "Emojis", action: {
+            //    changeTheme(emojisArray)
+            //})
+            //ThemeButton(imageName: "carrot", label: "Food", action: {
+            //    changeTheme(foodArray)
+            //})
             
         }
         .foregroundColor(.blue)
@@ -47,17 +48,20 @@ struct ContentView: View {
     
     var emojisCards: some View {
         LazyVGrid(columns: [GridItem(.adaptive(minimum: 80))], content: {
-            ForEach(0..<emojisToDisplay.count, id: \.self){ index in
-                CardView(content: emojisToDisplay[index])
+            ForEach(viewModel.cards, id: \.self.id){ card in
+                CardView(card: card)
+                    .onTapGesture{
+                        viewModel.toogle(card)
+                    }
             }
         })
         
     }
     
-    func changeTheme(_ cardType: Array<String>){
-        emojisToDisplay = []
-        emojisToDisplay = cardType.shuffled()
-    }
+   // func changeTheme(_ cardType: Array<String>){
+   //     emojisToDisplay = []
+   //     emojisToDisplay = cardType.shuffled()
+   // }
     
     func toggleFaceUp(){
        
@@ -70,9 +74,7 @@ struct ContentView: View {
 
 
 struct CardView: View {
-    let content: String
-    @State var isFaceUp:Bool = true
-    var isMatched:Bool = false
+    var card: MemoryGame<String>.Card
     
     var body: some View {
         ZStack{
@@ -83,20 +85,17 @@ struct CardView: View {
                     .strokeBorder(lineWidth: 4)
                     .aspectRatio(2/3, contentMode: .fit)
                     .foregroundColor(.blue)
-                Text(content)
+                Text(card.content)
                     .font(.system(size: 150))
                     .minimumScaleFactor(0.01)
                     .aspectRatio(1, contentMode: .fit)
                     .padding(5)
             }
-            base.fill().opacity(isFaceUp ? 0 : 1)
+            base.fill().opacity(card.isFaceUp ? 0 : 1)
             
             
         }
         .foregroundColor(.orange)
-        .onTapGesture {
-            isFaceUp.toggle()
-        }
 
         
     }
@@ -121,5 +120,5 @@ struct ThemeButton: View {
 }
 
 #Preview {
-    ContentView()
+    EmojiContentView(viewModel: EmojiMemoryGameViewModel())
 }
